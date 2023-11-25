@@ -1,18 +1,16 @@
-// +build windows
-// +build amd64
+//go:build windows && amd64
+// +build windows,amd64
 
 package goautoit
 
 import (
 	"log"
-	"path"
-	"runtime"
 	"syscall"
 	"unicode/utf16"
 	"unsafe"
 )
 
-//properties available in AutoItX.
+// properties available in AutoItX.
 const (
 	SWHide            = 0
 	SWMaximize        = 3
@@ -34,12 +32,12 @@ const (
 // HWND -- window handle
 type HWND uintptr
 
-//RECT -- http://msdn.microsoft.com/en-us/library/windows/desktop/dd162897.aspx
+// RECT -- http://msdn.microsoft.com/en-us/library/windows/desktop/dd162897.aspx
 type RECT struct {
 	Left, Top, Right, Bottom int32
 }
 
-//POINT --
+// POINT --
 type POINT struct {
 	X, Y int32
 }
@@ -116,9 +114,9 @@ func init() {
 	log.SetFlags(log.LstdFlags | log.Llongfile)
 	// dll64, err = syscall.LoadDLL("D:\\Program Files (x86)\\AutoIt3\\AutoItX\\AutoItX3_x64.dll")
 	// defer dll64.Release()
-	_, filename, _, _ := runtime.Caller(1)
-	filename = path.Join(path.Dir(filename), "lib\\AutoItX3_x64.dll")
-	dll64 = syscall.NewLazyDLL(filename)
+	//_, , _, _ := runtime.Caller(1)
+	//filename = path.Join(path.Dir(filename), "lib\\AutoItX3_x64.dll")
+	dll64 = syscall.NewLazyDLL("AutoItX3_x64.dll")
 	// dll64 = syscall.NewLazyDLL(os.Getenv("GOPATH") + "\\src\\github.com\\shadow1163\\goautoit\\lib\\AutoItX3_x64.dll")
 	clipGet = dll64.NewProc("AU3_ClipGet")
 	clipPut = dll64.NewProc("AU3_ClipPut")
@@ -185,12 +183,12 @@ func WinMinimizeAll() {
 	winMinimizeAll.Call()
 }
 
-//WinMinimizeAllUndo -- undo minimize all windows
+// WinMinimizeAllUndo -- undo minimize all windows
 func WinMinimizeAllUndo() {
 	winMinimizeAllundo.Call()
 }
 
-//WinGetTitle -- get windows title
+// WinGetTitle -- get windows title
 func WinGetTitle(szTitle, szText string, bufSize int) string {
 	// szTitle := "[active]"
 	// szText := ""
@@ -202,7 +200,7 @@ func WinGetTitle(szTitle, szText string, bufSize int) string {
 	return (goWString(buff))
 }
 
-//WinGetText -- get text in window
+// WinGetText -- get text in window
 func WinGetText(szTitle, szText string, bufSize int) string {
 	buff := make([]uint16, int(bufSize))
 	winGetText.Call(strPtr(szTitle), strPtr(szText), uintptr(unsafe.Pointer(&buff[0])), intPtr(bufSize))
@@ -241,7 +239,7 @@ func Run(szProgram string, args ...interface{}) int {
 	return int(pid)
 }
 
-//Send -- Send simulates input on the keyboard
+// Send -- Send simulates input on the keyboard
 // flag: 0: normal, 1: raw
 func Send(key string, args ...interface{}) {
 	var nMode int
@@ -258,8 +256,7 @@ func Send(key string, args ...interface{}) {
 	send.Call(strPtr(key), intPtr(nMode))
 }
 
-//WinWait -- wait window to active
-//
+// WinWait -- wait window to active
 func WinWait(szTitle string, args ...interface{}) int {
 	var szText string
 	var nTimeout int
@@ -291,7 +288,7 @@ func WinWait(szTitle string, args ...interface{}) int {
 	return int(handle)
 }
 
-//MouseClick -- Perform a mouse click operation.
+// MouseClick -- Perform a mouse click operation.
 func MouseClick(button string, args ...interface{}) int {
 	var x, y, nClicks, nSpeed int
 	var ok bool
@@ -345,7 +342,7 @@ func MouseClick(button string, args ...interface{}) int {
 	return int(ret)
 }
 
-//ControlClick -- Sends a mouse click command to a given control.
+// ControlClick -- Sends a mouse click command to a given control.
 func ControlClick(title, text, control string, args ...interface{}) int {
 	var button string
 	var x, y, nClicks int
@@ -396,7 +393,7 @@ func ControlClick(title, text, control string, args ...interface{}) int {
 	return int(ret)
 }
 
-//ControlClickByHandle -- Sends a mouse click command to a given control.
+// ControlClickByHandle -- Sends a mouse click command to a given control.
 func ControlClickByHandle(handle, control HWND, args ...interface{}) int {
 	var button string
 	var x, y, nClicks int
@@ -447,7 +444,7 @@ func ControlClickByHandle(handle, control HWND, args ...interface{}) int {
 	return int(ret)
 }
 
-//ClipGet -- get a string from clip
+// ClipGet -- get a string from clip
 func ClipGet(args ...interface{}) string {
 	var nBufSize int
 	var ok bool
@@ -614,7 +611,7 @@ func WinSetState(title, text string, flag int) int {
 	return int(ret)
 }
 
-//ControlSend -- Sends a string of characters to a control.
+// ControlSend -- Sends a string of characters to a control.
 func ControlSend(title, text, control, sendText string, args ...interface{}) int {
 	var nMode int
 	var ok bool
@@ -634,7 +631,7 @@ func ControlSend(title, text, control, sendText string, args ...interface{}) int
 	return int(ret)
 }
 
-//ControlSendByHandle -- Sends a string of characters to a control.
+// ControlSendByHandle -- Sends a string of characters to a control.
 func ControlSendByHandle(handle, control HWND, sendText string, args ...interface{}) int {
 	var nMode int
 	var ok bool
@@ -654,7 +651,7 @@ func ControlSendByHandle(handle, control HWND, sendText string, args ...interfac
 	return int(ret)
 }
 
-//ControlSetText -- Sets text of a control.
+// ControlSetText -- Sets text of a control.
 func ControlSetText(title, text, control, newText string) int {
 	ret, _, lastErr := controlSetText.Call(strPtr(title), strPtr(text), strPtr(control), strPtr(newText))
 	if int(ret) == 0 {
@@ -663,7 +660,7 @@ func ControlSetText(title, text, control, newText string) int {
 	return int(ret)
 }
 
-//ControlSetTextByHandle -- Sets text of a control.
+// ControlSetTextByHandle -- Sets text of a control.
 func ControlSetTextByHandle(handle, control HWND, newText string) int {
 	ret, _, lastErr := controlSetTextByHandle.Call(uintptr(handle), uintptr(control), strPtr(newText))
 	if int(ret) == 0 {
@@ -672,7 +669,7 @@ func ControlSetTextByHandle(handle, control HWND, newText string) int {
 	return int(ret)
 }
 
-//ControlCommand -- Sends a command to a control.
+// ControlCommand -- Sends a command to a control.
 func ControlCommand(title, text, control, command string, args ...interface{}) string {
 	var Extra string
 	var bufSize int
@@ -704,7 +701,7 @@ func ControlCommand(title, text, control, command string, args ...interface{}) s
 	return (goWString(buff))
 }
 
-//ControlCommandByHandle -- Sends a command to a control.
+// ControlCommandByHandle -- Sends a command to a control.
 func ControlCommandByHandle(handle, control HWND, command string, args ...interface{}) string {
 	var Extra string
 	var bufSize int
@@ -736,7 +733,7 @@ func ControlCommandByHandle(handle, control HWND, command string, args ...interf
 	return (goWString(buff))
 }
 
-//ControlListView --Sends a command to a ListView32 control.
+// ControlListView --Sends a command to a ListView32 control.
 func ControlListView(title, text, control, command string, args ...interface{}) string {
 	var Extra1, Extra2 string
 	var bufSize int
@@ -781,7 +778,7 @@ func ControlListView(title, text, control, command string, args ...interface{}) 
 	return (goWString(buff))
 }
 
-//ControlListViewByHandle --Sends a command to a ListView32 control.
+// ControlListViewByHandle --Sends a command to a ListView32 control.
 func ControlListViewByHandle(handle, control HWND, command string, args ...interface{}) string {
 	var Extra1, Extra2 string
 	var bufSize int
@@ -826,7 +823,7 @@ func ControlListViewByHandle(handle, control HWND, command string, args ...inter
 	return (goWString(buff))
 }
 
-//ControlDisable -- Disables or "grays-out" a control.
+// ControlDisable -- Disables or "grays-out" a control.
 func ControlDisable(title, text, control string) int {
 	ret, _, lastErr := controlDisable.Call(strPtr(title), strPtr(text), strPtr(control))
 	if int(ret) == 0 {
@@ -835,7 +832,7 @@ func ControlDisable(title, text, control string) int {
 	return int(ret)
 }
 
-//ControlDisableByHandle -- Disables or "grays-out" a control.
+// ControlDisableByHandle -- Disables or "grays-out" a control.
 func ControlDisableByHandle(handle, control HWND) int {
 	ret, _, lastErr := controlDisableByHandle.Call(uintptr(handle), uintptr(control))
 	if int(ret) == 0 {
@@ -844,7 +841,7 @@ func ControlDisableByHandle(handle, control HWND) int {
 	return int(ret)
 }
 
-//ControlEnable -- Enables a "grayed-out" control.
+// ControlEnable -- Enables a "grayed-out" control.
 func ControlEnable(title, text, control string) int {
 	ret, _, lastErr := controlEnable.Call(strPtr(title), strPtr(text), strPtr(control))
 	if int(ret) == 0 {
@@ -853,7 +850,7 @@ func ControlEnable(title, text, control string) int {
 	return int(ret)
 }
 
-//ControlEnableByHandle -- Enables a "grayed-out" control.
+// ControlEnableByHandle -- Enables a "grayed-out" control.
 func ControlEnableByHandle(handle, control HWND) int {
 	ret, _, lastErr := controlEnableByHandle.Call(uintptr(handle), uintptr(control))
 	if int(ret) == 0 {
@@ -862,7 +859,7 @@ func ControlEnableByHandle(handle, control HWND) int {
 	return int(ret)
 }
 
-//ControlFocus -- Sets input focus to a given control on a window.
+// ControlFocus -- Sets input focus to a given control on a window.
 func ControlFocus(title, text, control string) int {
 	ret, _, lastErr := controlFocus.Call(strPtr(title), strPtr(text), strPtr(control))
 	if int(ret) == 0 {
@@ -871,7 +868,7 @@ func ControlFocus(title, text, control string) int {
 	return int(ret)
 }
 
-//ControlFocusByHandle -- Sets input focus to a given control on a window.
+// ControlFocusByHandle -- Sets input focus to a given control on a window.
 func ControlFocusByHandle(handle, control HWND) int {
 	ret, _, lastErr := controlFocusByHandle.Call(uintptr(handle), uintptr(control))
 	if int(ret) == 0 {
@@ -880,7 +877,7 @@ func ControlFocusByHandle(handle, control HWND) int {
 	return int(ret)
 }
 
-//ControlGetHandle -- Retrieves the internal handle of a control.
+// ControlGetHandle -- Retrieves the internal handle of a control.
 func ControlGetHandle(handle HWND, control string) HWND {
 	ret, _, lastErr := controlGetHandle.Call(uintptr(handle), strPtr(control))
 	if int(ret) == 0 {
@@ -889,7 +886,7 @@ func ControlGetHandle(handle HWND, control string) HWND {
 	return HWND(ret)
 }
 
-//ControlGetHandleAsText -- Retrieves the internal handle of a control.
+// ControlGetHandleAsText -- Retrieves the internal handle of a control.
 func ControlGetHandleAsText(title, text, control string, args ...interface{}) string {
 	var bufSize int
 	var ok bool
@@ -911,7 +908,7 @@ func ControlGetHandleAsText(title, text, control string, args ...interface{}) st
 	return (goWString(buff))
 }
 
-//ControlGetPos -- Retrieves the position and size of a control relative to its window.
+// ControlGetPos -- Retrieves the position and size of a control relative to its window.
 func ControlGetPos(title, text, control string) RECT {
 	lprect := RECT{}
 	ret, _, lastErr := controlGetPos.Call(strPtr(title), strPtr(text), strPtr(control), uintptr(unsafe.Pointer(&lprect)))
@@ -921,7 +918,7 @@ func ControlGetPos(title, text, control string) RECT {
 	return lprect
 }
 
-//ControlGetPosByHandle -- Retrieves the position and size of a control relative to its window.
+// ControlGetPosByHandle -- Retrieves the position and size of a control relative to its window.
 func ControlGetPosByHandle(title, text, control string) RECT {
 	lprect := RECT{}
 	ret, _, lastErr := controlGetPosByHandle.Call(strPtr(title), strPtr(text), strPtr(control), uintptr(unsafe.Pointer(&lprect)))
@@ -931,7 +928,7 @@ func ControlGetPosByHandle(title, text, control string) RECT {
 	return lprect
 }
 
-//ControlGetText -- Retrieves text from a control.
+// ControlGetText -- Retrieves text from a control.
 func ControlGetText(title, text, control string, args ...interface{}) string {
 	var bufSize int
 	var ok bool
@@ -953,7 +950,7 @@ func ControlGetText(title, text, control string, args ...interface{}) string {
 	return (goWString(buff))
 }
 
-//ControlGetTextByHandle -- Retrieves text from a control.
+// ControlGetTextByHandle -- Retrieves text from a control.
 func ControlGetTextByHandle(handle, control HWND, args ...interface{}) string {
 	var bufSize int
 	var ok bool
@@ -975,7 +972,7 @@ func ControlGetTextByHandle(handle, control HWND, args ...interface{}) string {
 	return (goWString(buff))
 }
 
-//ControlHide -- Hides a control.
+// ControlHide -- Hides a control.
 func ControlHide(title, text, control string) int {
 	ret, _, lastErr := controlHide.Call(strPtr(title), strPtr(text), strPtr(control))
 	if int(ret) == 1 {
@@ -984,7 +981,7 @@ func ControlHide(title, text, control string) int {
 	return int(ret)
 }
 
-//ControlHideByHandle -- Hides a control.
+// ControlHideByHandle -- Hides a control.
 func ControlHideByHandle(title, text, control string) int {
 	ret, _, lastErr := controlHideByHandle.Call(strPtr(title), strPtr(text), strPtr(control))
 	if int(ret) == 1 {
@@ -993,7 +990,7 @@ func ControlHideByHandle(title, text, control string) int {
 	return int(ret)
 }
 
-//ControlMove -- Hides a control.
+// ControlMove -- Hides a control.
 func ControlMove(title, text, control string, x, y int, args ...interface{}) int {
 	var width, height int
 	var ok bool
@@ -1018,7 +1015,7 @@ func ControlMove(title, text, control string, x, y int, args ...interface{}) int
 	return int(ret)
 }
 
-//ControlMoveByHandle -- Hides a control.
+// ControlMoveByHandle -- Hides a control.
 func ControlMoveByHandle(handle, control HWND, x, y int, args ...interface{}) int {
 	var width, height int
 	var ok bool
@@ -1043,7 +1040,7 @@ func ControlMoveByHandle(handle, control HWND, x, y int, args ...interface{}) in
 	return int(ret)
 }
 
-//ControlShow -- Shows a control that was hidden.
+// ControlShow -- Shows a control that was hidden.
 func ControlShow(title, text, control string) int {
 	ret, _, lastErr := controlShow.Call(strPtr(title), strPtr(text), strPtr(control))
 	if int(ret) == 1 {
@@ -1052,7 +1049,7 @@ func ControlShow(title, text, control string) int {
 	return int(ret)
 }
 
-//ControlShowByHandle -- Shows a control that was hidden.
+// ControlShowByHandle -- Shows a control that was hidden.
 func ControlShowByHandle(handle, control HWND) int {
 	ret, _, lastErr := controlShowByHandle.Call(uintptr(handle), uintptr(control))
 	if int(ret) == 1 {
@@ -1061,7 +1058,7 @@ func ControlShowByHandle(handle, control HWND) int {
 	return int(ret)
 }
 
-//ControlTreeView -- Sends a command to a TreeView32 control.
+// ControlTreeView -- Sends a command to a TreeView32 control.
 func ControlTreeView(title, text, control, command string, args ...interface{}) string {
 	var Extra1, Extra2 string
 	var bufSize int
@@ -1106,7 +1103,7 @@ func ControlTreeView(title, text, control, command string, args ...interface{}) 
 	return (goWString(buff))
 }
 
-//ControlTreeViewByHandle -- Sends a command to a TreeView32 control.
+// ControlTreeViewByHandle -- Sends a command to a TreeView32 control.
 func ControlTreeViewByHandle(handle, control HWND, command string, args ...interface{}) string {
 	var Extra1, Extra2 string
 	var bufSize int
@@ -1151,7 +1148,7 @@ func ControlTreeViewByHandle(handle, control HWND, command string, args ...inter
 	return (goWString(buff))
 }
 
-//Opt -- set option
+// Opt -- set option
 func Opt(option, value string) int {
 	ret, _, lastErr := opt.Call(strPtr(option), strPtr(value))
 	if int(ret) == 0 {
