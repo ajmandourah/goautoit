@@ -4,7 +4,7 @@ golang invoke autoit function through AutoItX3.dll
 ## Install
 
 ```golang
-go get -u github.com/ajmandiurab/goautoit
+go get -u github.com/ajmandourah/goautoit
 ```
 Either download the latest version of the autoit DLL or use the included one. 
 
