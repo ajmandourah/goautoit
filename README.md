@@ -4,9 +4,11 @@ golang invoke autoit function through AutoItX3.dll
 ## Install
 
 ```golang
-go get -u github.com/shadow1163/goautoit
+go get -u github.com/ajmandiurab/goautoit
 ```
+Either download the latest version of the autoit DLL or use the included one. 
 
+Put the DLL in the same path as your project. 
 ## Example
 
 - open notepad
