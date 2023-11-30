@@ -1,5 +1,5 @@
-// +build windows
-// +build amd64
+//go:build windows && amd64
+// +build windows,amd64
 
 package goautoit
 
@@ -8,7 +8,7 @@ import (
 	"unsafe"
 )
 
-//MouseClickDrag -- Perform a mouse click and drag operation.
+// MouseClickDrag -- Perform a mouse click and drag operation.
 func MouseClickDrag(button string, x1, y1, x2, y2 int, args ...interface{}) int {
 	var nSpeed int
 	var ok bool
@@ -22,7 +22,7 @@ func MouseClickDrag(button string, x1, y1, x2, y2 int, args ...interface{}) int 
 	} else {
 		panic("Error parameters")
 	}
-	ret, _, lastErr := mouseClickDrag.Call(strPtr(button), intPtr(x1), intPtr(x2), intPtr(y2), intPtr(nSpeed))
+	ret, _, lastErr := mouseClickDrag.Call(strPtr(button), intPtr(x1), intPtr(y1), intPtr(x2), intPtr(y2), intPtr(nSpeed))
 	if int(ret) != 1 {
 		log.Print("failure!!!")
 		log.Println(lastErr)
@@ -74,7 +74,7 @@ func MouseUp(args ...interface{}) int {
 	return int(ret)
 }
 
-//MouseGetCursor -- Returns the cursor ID Number for the current Mouse Cursor.
+// MouseGetCursor -- Returns the cursor ID Number for the current Mouse Cursor.
 func MouseGetCursor() int {
 	ret, _, lastErr := mouseGetCursor.Call()
 	if int(ret) == -1 {
@@ -93,7 +93,7 @@ func MouseGetPos() (int32, int32) {
 	return point.X, point.Y
 }
 
-//MouseMove -- Moves the mouse pointer.
+// MouseMove -- Moves the mouse pointer.
 func MouseMove(x, y int, args ...interface{}) {
 	var nSpeed int
 	var ok bool
@@ -113,7 +113,7 @@ func MouseMove(x, y int, args ...interface{}) {
 	}
 }
 
-//MouseWheel -- Moves the mouse wheel up or down.
+// MouseWheel -- Moves the mouse wheel up or down.
 func MouseWheel(szDirection string, args ...interface{}) int {
 	var nClicks int
 	var ok bool
